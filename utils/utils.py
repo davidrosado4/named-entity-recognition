@@ -1,6 +1,12 @@
 from tqdm import tqdm
 from skseq.sequences.sequence_list import SequenceList
 from skseq.sequences.label_dictionary import LabelDictionary
+import numpy as np
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import f1_score
 
 
 def get_data_target_sets(data):
@@ -159,3 +165,121 @@ def get_tiny_test():
              'I-geo', 'O']]
 
     return [i[0].split() for i in X], y
+
+
+def predict_SP(model, X):
+    """
+    Predicts the tags for the input sequences using a StructuredPerceptron model.
+
+    Args:
+        model: A trained StructuredPerceptron model.
+        X: A list of input sequences (sentences).
+
+    Returns:
+        A list of predicted tags for the input sequences.
+    """
+    y_pred = []
+
+    # Use tqdm to create a progress bar
+    progress_bar = tqdm(range(len(X)), desc="Predicting tags", unit="sequence")
+
+    for i in progress_bar:
+        # Predict the tags for the current input sequence
+        predicted_tag = model.predict_tags_given_words(X[i])
+        y_pred.append(predicted_tag)
+
+    y_pred = [np.ndarray.tolist(array) for array in y_pred]
+    y_pred = np.concatenate(y_pred).ravel().tolist()
+
+    return y_pred
+
+
+def accuracy(true, pred):
+    """
+    Computes the accuracy of predicted tags compared to true tags, excluding instances where true[i] == 'O'.
+
+    Args:
+        true: A list of true tags.
+        pred: A list of predicted tags.
+
+    Returns:
+        The accuracy score, which measures the proportion of correct predictions.
+    """
+    # Get indexes of those that are not 'O'
+    idx = [i for i, x in enumerate(true) if x != 'O']
+
+    # Get the true and predicted tags for those indexes
+    true = [true[i] for i in idx]
+    pred = [pred[i] for i in idx]
+
+    # Use sklearn's accuracy_score to compute the accuracy
+    return accuracy_score(true, pred)
+
+
+def plot_confusion_matrix(true, pred, tag_dict_rev):
+    """
+    Plots a confusion matrix using a heatmap.
+
+    Args:
+        true: A list or array of true labels.
+        pred: A list or array of predicted labels.
+        tag_dict_rev: A dictionary mapping tag values to their corresponding labels.
+
+    Returns:
+        None
+    """
+    # Get all unique tag values from true and pred lists
+    unique_tags = np.unique(np.concatenate((true, pred)))
+
+    # Create a tick label list with all unique tags
+    tick_labels = [tag_dict_rev.get(tag, tag) for tag in unique_tags]
+
+    # Get the confusion matrix
+    cm = confusion_matrix(true, pred)
+
+    # Plot the confusion matrix
+    plt.figure(figsize=(10, 10))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', cbar=False, xticklabels=tick_labels, yticklabels=tick_labels)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title('Confusion Matrix')
+    plt.show()
+
+
+def f1_score_weighted(true, pred):
+    """
+    Computes the weighted F1 score based on the true and predicted tags.
+
+    Args:
+        true: A list of true tags.
+        pred: A list of predicted tags.
+
+    Returns:
+        The weighted F1 score.
+    """
+    # Get the weighted F1 score using sklearn's f1_score function
+    return f1_score(true, pred, average='weighted')
+
+
+def evaluate(true, pred, tag_dict_rev):
+    """
+    Computes and prints evaluation metrics and displays a confusion matrix based on the true and predicted tags.
+
+    Args:
+        true: A list of true tags.
+        pred: A list of predicted tags.
+        tag_dict_rev: A dictionary mapping tag indexes to tag labels.
+
+    Returns:
+        None
+    """
+    # Compute the accuracy and F1 score using predefined functions
+    acc = accuracy(true, pred)
+    f1 = f1_score_weighted(true, pred)
+
+    # Print the evaluation results
+    print('Accuracy: {:.4f}'.format(acc))
+    print('F1 Score: {:.4f}'.format(f1))
+
+    # Plot the confusion matrix
+    plot_confusion_matrix(true, pred, tag_dict_rev)
