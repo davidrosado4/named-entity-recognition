@@ -10,7 +10,7 @@ simple solution.
 The solution was developed by the following collaborators:
 
 - [@sergibech](https://github.com/sergibech)
-- [@alexpv01](https://github.com/alexpv01)
+- [@alex-pv01](https://github.com/alex-pv01)
 - [@davidrosado4](https://github.com/davidrosado4)
 - [@Goodjorx](https://github.com/Goodjorx)
 - [@sarabase](https://github.com/sarabase)
