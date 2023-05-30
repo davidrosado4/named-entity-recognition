@@ -35,12 +35,11 @@ To reproduce the results obtained by our models, follow these steps:
 git clone https://github.com/sarabase/named-entity-recognition.git
 ```
 
-2. Create a python environment and install the necessary requirements. Activate the environment.
+2. Create a conda environment and install the necessary requirements. Activate the environment:
 
 ```
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
+conda create --name ner_env --file requirements.txt
+conda activate ner_env
 ```
 
 3. If you want to see how the models are trained, open the train_models.ipynb notebook in Jupyter and execute the cells.
