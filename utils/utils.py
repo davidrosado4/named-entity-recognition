@@ -283,3 +283,31 @@ def evaluate(true, pred, tag_dict_rev):
 
     # Plot the confusion matrix
     plot_confusion_matrix(true, pred, tag_dict_rev)
+
+
+def print_tiny_test_prediction(X, model, tag_dict_rev):
+    """
+    Prints the predicted tags for each input sequence.
+
+    Args:
+        X: A list of input sequences.
+        model: The trained model used for prediction.
+        tag_dict_rev: A dictionary mapping tag indexes to tag labels.
+
+    Returns:
+        None
+    """
+    y_pred = []
+    for i in range(len(X)):
+        # Predict the tags for the current input sequence
+        predicted_tag = model.predict_tags_given_words(X[i])
+        y_pred.append(predicted_tag)
+
+    for i in range(len(X)):
+        sentence = X[i]
+        tag_list = y_pred[i]
+        prediction = ''
+        for j in range(len(sentence)):
+            prediction += sentence[j] + "/" + tag_dict_rev[tag_list[j]] + " "
+
+        print(prediction + "\n")
