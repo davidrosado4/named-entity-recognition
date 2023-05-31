@@ -1,5 +1,5 @@
-from skseq.sequences.id_feature import IDFeatures
-from skseq.sequences.id_feature import UnicodeFeatures
+from skseq.id_feature import IDFeatures
+
 
 # ----------
 # Feature Class

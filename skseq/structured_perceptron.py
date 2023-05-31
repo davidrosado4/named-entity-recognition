@@ -1,7 +1,7 @@
 from __future__ import division
 import numpy as np
-import skseq.sequences.discriminative_sequence_classifier as dsc
-import skseq.sequences.sequence as seq
+import skseq.discriminative_sequence_classifier as dsc
+import skseq.sequence as seq
 
 class StructuredPerceptron(dsc.DiscriminativeSequenceClassifier):
     """

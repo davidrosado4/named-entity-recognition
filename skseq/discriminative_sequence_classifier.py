@@ -1,5 +1,5 @@
 import numpy as np
-import skseq.sequences.sequence_classifier as sc
+import skseq.sequence_classifier as sc
 
 
 class DiscriminativeSequenceClassifier(sc.SequenceClassifier):

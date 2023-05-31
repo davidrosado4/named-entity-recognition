@@ -1,5 +1,4 @@
-import numpy as np
-from skseq.sequences.log_domain import *
+from skseq.log_domain import *
 
 
 class SequenceClassificationDecoder:

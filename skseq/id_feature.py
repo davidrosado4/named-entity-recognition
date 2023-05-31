@@ -1,4 +1,4 @@
-from skseq.sequences.label_dictionary import *
+from skseq.label_dictionary import *
 
 # ----------
 # Replicates the same features as the HMM

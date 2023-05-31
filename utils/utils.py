@@ -1,12 +1,13 @@
 from tqdm import tqdm
-from skseq.sequences.sequence_list import SequenceList
-from skseq.sequences.label_dictionary import LabelDictionary
+#from skseq.sequences.sequence_list import SequenceList
+from skseq.label_dictionary import LabelDictionary
 import numpy as np
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
+from skseq import sequence_list_c
 
 
 def get_data_target_sets(data):
@@ -89,7 +90,7 @@ def create_sequence_list(word_dict, tag_dict, X, y):
     Returns:
         A sequence list object populated with sequences from X and y.
     """
-    seq = SequenceList(LabelDictionary(word_dict), LabelDictionary(tag_dict))
+    seq = sequence_list_c.SequenceList(LabelDictionary(word_dict), LabelDictionary(tag_dict))
 
     # Use tqdm to create a progress bar
     progress_bar = tqdm(range(len(X)), desc="Adding sequences", unit="sequence")

@@ -1,5 +1,5 @@
 import numpy as np
-import skseq.sequences.sequence_classification_decoder as scd
+import skseq.sequence_classification_decoder as scd
 
 
 class SequenceClassifier:
