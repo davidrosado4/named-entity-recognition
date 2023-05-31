@@ -1,5 +1,4 @@
 import skseq.sequence as seq
-
 class _SequenceIterator(object):
     """
     Class used to define how to iterate over a SequenceList object
