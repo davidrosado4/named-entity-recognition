@@ -5,6 +5,20 @@ from skseq.id_feature import IDFeatures
 # Feature Class
 # Extracts features from a labeled corpus (only supported features are extracted
 # ----------
+# List of stopwords
+stopwords_list = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself',
+                  'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself',
+                  'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that',
+                  'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+                  'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because',
+                  'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into',
+                  'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out',
+                  'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where',
+                  'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no',
+                  'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just',
+                  'don', 'should', 'now']
+prep_list = ['in', 'at', 'on', 'of', 'to', 'for', 'with', 'from', 'by', 'about', 'as', 'into', 'like', 'through','the']
+
 class ExtendedFeatures(IDFeatures):
     """
     A class that extends the functionality of IDFeatures by adding additional features.
@@ -132,9 +146,21 @@ class ExtendedFeatures(IDFeatures):
                 features.append(feat_id)
 
         # Check if is a certain word (e.g., the, to, an, etc.)
-        # (Different functions can be added here for specific words)
+        if word in prep_list:
+            feat_name = "Preposition::%s" % y_name
+            feat_name = str(feat_name)
+
+            feat_id = self.add_feature(feat_name)
+            if feat_id != -1:
+                features.append(feat_id)
 
         # Check if is a stopword
-        # (Function for checking stopwords can be added here)
+        if word in stopwords_list:
+            feat_name = "stopword::%s" % y_name
+            feat_name = str(feat_name)
+
+            feat_id = self.add_feature(feat_name)
+            if feat_id != -1:
+                features.append(feat_id)
 
         return features
