@@ -17,6 +17,7 @@ stopwords_list = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', '
                   'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no',
                   'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just',
                   'don', 'should', 'now']
+# List of prepositions
 prep_list = ['in', 'at', 'on', 'of', 'to', 'for', 'with', 'from', 'by', 'about', 'as', 'into', 'like', 'through','the']
 
 class ExtendedFeatures(IDFeatures):
