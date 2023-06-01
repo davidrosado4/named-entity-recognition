@@ -1,4 +1,5 @@
 import skseq.sequence as seq
+import cython
 class _SequenceIterator(object):
     """
     Class used to define how to iterate over a SequenceList object
@@ -20,7 +21,7 @@ class _SequenceIterator(object):
         return r
 
 
-class SequenceList(object):
+class SequenceListC(object):
 
     def __init__(self, x_dict={}, y_dict={}):
         self.x_dict = x_dict
@@ -51,10 +52,15 @@ class SequenceList(object):
         sum of the length of the sequences."""
         return sum([seq.size() for seq in self.seq_list])
 
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     def add_sequence(self, x, y, x_dict, y_dict):
         """Add a sequence to the list, where
             - x is the sequence of  observations,
             - y is the sequence of states."""
+
+        # Create and append the sequence
+
         num_seqs = len(self.seq_list)
         cdef list x_ids = [x_dict.get_label_id(name) for name in x]
         cdef list y_ids = [y_dict.get_label_id(name) for name in y]

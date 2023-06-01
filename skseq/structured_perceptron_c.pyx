@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import skseq.discriminative_sequence_classifier as dsc
 import skseq.sequence as seq
+import cython
 class StructuredPerceptronC(dsc.DiscriminativeSequenceClassifier):
     """
     Implements an Structured  Perceptron
@@ -20,7 +21,8 @@ class StructuredPerceptronC(dsc.DiscriminativeSequenceClassifier):
         self.params_per_epoch = []
         self.parameters = np.zeros(self.feature_mapper.get_num_features())
         self.fitted = False
-
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     def fit(self, dataset, int num_epochs):
         """
         Parameters
@@ -55,7 +57,8 @@ class StructuredPerceptronC(dsc.DiscriminativeSequenceClassifier):
             self.parameters = new_w
 
         self.fitted = True
-
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     def fit_epoch(self, dataset):
         """
         Method used to train the perceptron for a full epoch over the data
@@ -95,7 +98,8 @@ class StructuredPerceptronC(dsc.DiscriminativeSequenceClassifier):
         sequence =  seq.Sequence(x=words, y=words)
         predicted_sequence, _ = self.viterbi_decode(sequence)
         return predicted_sequence.y
-
+    @cython.boundscheck(False)
+    @cython.wraparound(False)
     def perceptron_update(self, sequence):
         """
         Method used to train the perceptron for a single datapoint.

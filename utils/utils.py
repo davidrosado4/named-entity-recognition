@@ -1,5 +1,5 @@
 from tqdm import tqdm
-#from skseq.sequences.sequence_list import SequenceList
+from skseq.sequence_list import SequenceList
 from skseq.label_dictionary import LabelDictionary
 import numpy as np
 from sklearn.metrics import accuracy_score
@@ -77,9 +77,9 @@ def create_corpus(sentences, tags):
     return word_dict, tag_dict, tag_dict_rev
 
 
-def create_sequence_list(word_dict, tag_dict, X, y):
+def create_sequence_listC(word_dict, tag_dict, X, y):
     """
-    Creates a sequence list object by adding sequences from X and y to it.
+    Creates a sequence list object by adding sequences from X and y to it using cython.
 
     Args:
         word_dict: A dictionary mapping words to their corresponding indices.
@@ -90,7 +90,7 @@ def create_sequence_list(word_dict, tag_dict, X, y):
     Returns:
         A sequence list object populated with sequences from X and y.
     """
-    seq = sequence_list_c.SequenceList(LabelDictionary(word_dict), LabelDictionary(tag_dict))
+    seq = sequence_list_c.SequenceListC(LabelDictionary(word_dict), LabelDictionary(tag_dict))
 
     # Use tqdm to create a progress bar
     progress_bar = tqdm(range(len(X)), desc="Adding sequences", unit="sequence")
@@ -100,7 +100,29 @@ def create_sequence_list(word_dict, tag_dict, X, y):
         seq.add_sequence(X[i], y[i], LabelDictionary(word_dict), LabelDictionary(tag_dict))
 
     return seq
+def create_sequence_list(word_dict, tag_dict, X, y):
+    """
+    Creates a sequence list object by adding sequences from X and y to it without cython.
 
+    Args:
+        word_dict: A dictionary mapping words to their corresponding indices.
+        tag_dict: A dictionary mapping tags to their corresponding indices.
+        X: A list of input sequences (sentences).
+        y: A list of corresponding target sequences (tags).
+
+    Returns:
+        A sequence list object populated with sequences from X and y.
+    """
+    seq = SequenceList(LabelDictionary(word_dict), LabelDictionary(tag_dict))
+
+    # Use tqdm to create a progress bar
+    progress_bar = tqdm(range(len(X)), desc="Adding sequences", unit="sequence")
+
+    for i in progress_bar:
+        # Add the sequence (X[i], y[i]) to the sequence list
+        seq.add_sequence(X[i], y[i], LabelDictionary(word_dict), LabelDictionary(tag_dict))
+
+    return seq
 
 def show_features(feature_mapper, seq, feature_type=["Initial features", "Transition features", "Final features", "Emission features"]):
     """
