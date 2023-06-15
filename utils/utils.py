@@ -8,9 +8,9 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import f1_score
 from skseq import sequence_list_c
-from sklearn import preprocessing
-from transformers import BertTokenizerFast
-import tensorflow as tf
+#from sklearn import preprocessing
+#from transformers import BertTokenizerFast
+#import tensorflow as tf
 
 def get_data_target_sets(data):
     """
@@ -337,107 +337,107 @@ def print_tiny_test_prediction(X, model, tag_dict_rev):
 
         print(prediction + "\n")
 
-#-----------------------------------------------------------------------------------------------------------------------
-#----------------------------------- Functions for DL approach. BERT model----------------------------------------------
-#-----------------------------------------------------------------------------------------------------------------------
-def process_BERT_data(df):
-    """
-    Preprocesses the input dataframe for sentence tagging.
-
-    Args:
-        df (pandas.DataFrame): The input dataframe containing the data to be processed.
-
-    Returns:
-        tuple: A tuple containing the processed data.
-            - sentences (numpy.ndarray): An array of lists, where each list represents the words in a sentence.
-            - tag (numpy.ndarray): An array of lists, where each list represents the tags corresponding to the words in a sentence.
-            - enc_tag (sklearn.preprocessing.LabelEncoder): The fitted LabelEncoder object used to encode the tags.
-    """
-    # Fill missing values in the "sentence_id" column with the previous non-null value
-    df.loc[:, "sentence_id"] = df["sentence_id"].fillna(method="ffill")
-
-    # Initialize a LabelEncoder object to encode the "tags" column
-    enc_tag = preprocessing.LabelEncoder()
-
-    # Encode the values in the "tags" column using the LabelEncoder
-    df.loc[:, "tags"] = enc_tag.fit_transform(df["tags"])
-
-    # Group the "words" column by "sentence_id" and convert them into lists
-    sentences = df.groupby("sentence_id")["words"].apply(list).values
-
-    # Group the "tags" column by "sentence_id" and convert them into lists
-    tag = df.groupby(by='sentence_id')['tags'].apply(list).values
-
-    # Return the processed data: sentences, tag, and enc_tag
-    return sentences, tag, enc_tag
-
-def tokenize_BERT(data, max_len=128):
-    """
-    Tokenizes the input data using the BERT tokenizer.
-
-    Args:
-        data (list): A list of input sentences or texts to be tokenized.
-        max_len (int): The maximum length of the tokenized sequences (default: 128).
-
-    Returns:
-        tuple: A tuple containing the tokenized input data.
-            - input_ids (numpy.ndarray): A 2D array of shape (n_samples, max_len) containing the tokenized input IDs.
-            - attention_mask (numpy.ndarray): A 2D array of shape (n_samples, max_len) containing the attention masks.
-    """
-    # Initialize the BERT tokenizer
-    tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
-
-    input_ids = list()
-    attention_mask = list()
-
-    # Iterate over the data and tokenize each entry
-    for i in tqdm(range(len(data))):
-        encoded = tokenizer.encode_plus(
-            data[i],
-            add_special_tokens=True,
-            max_length=max_len,
-            is_split_into_words=True,
-            return_attention_mask=True,
-            padding='max_length',
-            truncation=True,
-            return_tensors='np'
-        )
-
-        input_ids.append(encoded['input_ids'])
-        attention_mask.append(encoded['attention_mask'])
-
-    # Convert the lists to numpy arrays and stack them vertically
-    return np.vstack(input_ids), np.vstack(attention_mask)
-
-def create_BERT_model(bert_model, max_len=128):
-    """
-    Creates a classification model based on the BERT model.
-
-    Args:
-        bert_model (tf.keras.Model): The BERT model to use as a base.
-        max_len (int): The maximum length of the input sequences (default: 128).
-
-    Returns:
-        tf.keras.Model: The compiled classification model.
-    """
-    input_ids = tf.keras.Input(shape=(max_len,), dtype='int32')
-    attention_masks = tf.keras.Input(shape=(max_len,), dtype='int32')
-
-    # Pass the input_ids and attention_masks to the BERT model
-    bert_output = bert_model(input_ids, attention_mask=attention_masks, return_dict=True)
-
-    # Apply dropout to the last_hidden_state output of BERT
-    embedding = tf.keras.layers.Dropout(0.3)(bert_output["last_hidden_state"])
-
-    # Add a dense layer with softmax activation for classification
-    output = tf.keras.layers.Dense(17, activation='softmax')(embedding)
-
-    # Create the model with inputs and outputs
-    model = tf.keras.models.Model(inputs=[input_ids, attention_masks], outputs=[output])
-
-    # Compile the model with optimizer, loss function, and metrics
-    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.00001),
-                  loss="sparse_categorical_crossentropy",
-                  metrics=["accuracy"])
-
-    return model
+# #-----------------------------------------------------------------------------------------------------------------------
+# #----------------------------------- Functions for DL approach. BERT model----------------------------------------------
+# #-----------------------------------------------------------------------------------------------------------------------
+# def process_BERT_data(df):
+#     """
+#     Preprocesses the input dataframe for sentence tagging.
+#
+#     Args:
+#         df (pandas.DataFrame): The input dataframe containing the data to be processed.
+#
+#     Returns:
+#         tuple: A tuple containing the processed data.
+#             - sentences (numpy.ndarray): An array of lists, where each list represents the words in a sentence.
+#             - tag (numpy.ndarray): An array of lists, where each list represents the tags corresponding to the words in a sentence.
+#             - enc_tag (sklearn.preprocessing.LabelEncoder): The fitted LabelEncoder object used to encode the tags.
+#     """
+#     # Fill missing values in the "sentence_id" column with the previous non-null value
+#     df.loc[:, "sentence_id"] = df["sentence_id"].fillna(method="ffill")
+#
+#     # Initialize a LabelEncoder object to encode the "tags" column
+#     enc_tag = preprocessing.LabelEncoder()
+#
+#     # Encode the values in the "tags" column using the LabelEncoder
+#     df.loc[:, "tags"] = enc_tag.fit_transform(df["tags"])
+#
+#     # Group the "words" column by "sentence_id" and convert them into lists
+#     sentences = df.groupby("sentence_id")["words"].apply(list).values
+#
+#     # Group the "tags" column by "sentence_id" and convert them into lists
+#     tag = df.groupby(by='sentence_id')['tags'].apply(list).values
+#
+#     # Return the processed data: sentences, tag, and enc_tag
+#     return sentences, tag, enc_tag
+#
+# def tokenize_BERT(data, max_len=128):
+#     """
+#     Tokenizes the input data using the BERT tokenizer.
+#
+#     Args:
+#         data (list): A list of input sentences or texts to be tokenized.
+#         max_len (int): The maximum length of the tokenized sequences (default: 128).
+#
+#     Returns:
+#         tuple: A tuple containing the tokenized input data.
+#             - input_ids (numpy.ndarray): A 2D array of shape (n_samples, max_len) containing the tokenized input IDs.
+#             - attention_mask (numpy.ndarray): A 2D array of shape (n_samples, max_len) containing the attention masks.
+#     """
+#     # Initialize the BERT tokenizer
+#     tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
+#
+#     input_ids = list()
+#     attention_mask = list()
+#
+#     # Iterate over the data and tokenize each entry
+#     for i in tqdm(range(len(data))):
+#         encoded = tokenizer.encode_plus(
+#             data[i],
+#             add_special_tokens=True,
+#             max_length=max_len,
+#             is_split_into_words=True,
+#             return_attention_mask=True,
+#             padding='max_length',
+#             truncation=True,
+#             return_tensors='np'
+#         )
+#
+#         input_ids.append(encoded['input_ids'])
+#         attention_mask.append(encoded['attention_mask'])
+#
+#     # Convert the lists to numpy arrays and stack them vertically
+#     return np.vstack(input_ids), np.vstack(attention_mask)
+#
+# def create_BERT_model(bert_model, max_len=128):
+#     """
+#     Creates a classification model based on the BERT model.
+#
+#     Args:
+#         bert_model (tf.keras.Model): The BERT model to use as a base.
+#         max_len (int): The maximum length of the input sequences (default: 128).
+#
+#     Returns:
+#         tf.keras.Model: The compiled classification model.
+#     """
+#     input_ids = tf.keras.Input(shape=(max_len,), dtype='int32')
+#     attention_masks = tf.keras.Input(shape=(max_len,), dtype='int32')
+#
+#     # Pass the input_ids and attention_masks to the BERT model
+#     bert_output = bert_model(input_ids, attention_mask=attention_masks, return_dict=True)
+#
+#     # Apply dropout to the last_hidden_state output of BERT
+#     embedding = tf.keras.layers.Dropout(0.3)(bert_output["last_hidden_state"])
+#
+#     # Add a dense layer with softmax activation for classification
+#     output = tf.keras.layers.Dense(17, activation='softmax')(embedding)
+#
+#     # Create the model with inputs and outputs
+#     model = tf.keras.models.Model(inputs=[input_ids, attention_masks], outputs=[output])
+#
+#     # Compile the model with optimizer, loss function, and metrics
+#     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.00001),
+#                   loss="sparse_categorical_crossentropy",
+#                   metrics=["accuracy"])
+#
+#     return model
