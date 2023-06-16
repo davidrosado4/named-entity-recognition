@@ -12,7 +12,7 @@ from keras.utils import pad_sequences
 from tensorflow.keras import Model, Input
 from tensorflow import keras
 from tensorflow.keras.layers import InputLayer, Embedding, SpatialDropout1D, Bidirectional, LSTM, Dense, TimeDistributed
-
+import pandas as pd
 
 def get_data_target_sets(data):
     """
@@ -547,5 +547,82 @@ def predict_lstm(model, X):
 
     # Return the predicted labels
     return y_train_pred
+
+def get_tiny_test_lstm():
+    """
+    Creates a dataframe with the data from X_tiny and y_tiny.
+
+    Returns:
+    - df: A dataframe containing the sentence IDs, words, and tags.
+    """
+
+    # Initialize empty lists for each column
+    sentence_ids = []
+    words = []
+    tags = []
+
+    # Get X_tiny and y_tiny
+    X_tiny, y_tiny = get_tiny_test()
+
+    # Iterate over each sentence and its corresponding tags
+    for i, (sentence_tokens, tag_tokens) in enumerate(zip(X_tiny, y_tiny)):
+        # Extract words and tags for the current sentence
+        sentence = sentence_tokens
+        tags_list = tag_tokens
+
+        # Append words and tags to the respective lists
+        words.extend(sentence)
+        tags.extend(tags_list)
+        sentence_ids.extend([i + 1] * len(sentence))  # Assign sentence ID to each word
+
+    # Create a dictionary with the data
+    data = {
+        'sentence_id': sentence_ids,
+        'words': words,
+        'tags': tags
+    }
+
+    # Create the dataframe
+    df = pd.DataFrame(data)
+    return df
+def print_tiny_test_prediction_lstm(X_tiny, y_tiny_pred, word2idx, tag_dict_rev):
+    """
+    Prints the predictions for the X_tiny dataset using the LSTM model.
+
+    Arguments:
+    - X_tiny: The input data for prediction.
+    - y_tiny_pred: The predicted tags for the input data.
+    - word2idx: A dictionary mapping words to their corresponding indices.
+    - tag_dict_rev: A dictionary mapping tag indexes to tag labels.
+
+    """
+
+    # Create a reversed vocabulary dictionary for mapping indices back to words
+    reversed_vocabulary = {value: key for key, value in word2idx.items()}
+
+    # Iterate over the sentences and their predicted tags
+    for i in range(0, 12):
+        sentence = X_tiny[i]
+        tags = y_tiny_pred[i]
+        sentence_short = []
+
+        # Create a shortened sentence by stopping at the first occurrence of a point (value 22)
+        for i in range(0, len(sentence)):
+            sentence_short.append(sentence[i])
+            if sentence_short[i] == 22:
+                break
+
+        # Convert the sentence indices to word vectors using the reversed vocabulary
+        word_vector = [reversed_vocabulary[position] for position in sentence_short]
+        tags = tags[0:len(word_vector)]
+
+        # Convert the tag indices to tag vectors using the tag dictionary
+        tags_vector = [tag_dict_rev[position] for position in tags]
+
+        # Print the token and its corresponding tag
+        for token, tag in zip(word_vector, tags_vector):
+            print(f'{token}/{tag}', end=' ')
+        print('\n')
+
 
 
